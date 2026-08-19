@@ -77,7 +77,7 @@ def planter(name, x, y, z=0.0, scale=1.0, flower="RK_MAT_FlowerBlue"):
         fy = y + math.sin(angle) * 0.50 * scale
         fz = z + (1.18 + 0.22 * (idx % 2)) * scale
         C.ico_sphere(f"{name}_Flower_{idx:02d}", (fx, fy, fz), (0.23 * scale,) * 3, flower if idx % 3 else "RK_MAT_FlowerCream", coll, subdivisions=1)
-    # A few hanging vines over the front lip.
+    # Hanging vines over the front lip.
     for idx, dx in enumerate((-0.52, 0.0, 0.52)):
         C.bezier_curve(
             f"{name}_Vine_{idx:02d}",
@@ -129,21 +129,107 @@ def bench(name, x, y, rotation=0.0):
 
 
 def knight(name, x, y, facing=0.0, scale=1.0):
-    # Simple but readable stylized guard silhouette from the references.
-    C.cylinder(f"{name}_Torso", (x, y, 1.65 * scale), 0.42 * scale, 1.25 * scale, "RK_MAT_NavyLight", coll, vertices=12, bevel_width=0.05)
-    C.uv_sphere(f"{name}_Helmet", (x, y, 2.55 * scale), (0.90 * scale, 0.78 * scale, 0.80 * scale), "RK_MAT_Silver", coll, segments=20, rings=12)
-    C.box(f"{name}_Visor", (x, y - 0.41 * scale, 2.52 * scale), (0.76 * scale, 0.12 * scale, 0.24 * scale), "RK_MAT_BlackMetal", coll, bevel_width=0.05)
-    C.cone(f"{name}_Plume", (x, y, 3.15 * scale), 0.22 * scale, 0.05 * scale, 0.72 * scale, "RK_MAT_RedBow", coll, vertices=12)
+    # Stylized silver plate armor guard with spear (Image 1, 2, 4).
+    C.cylinder(f"{name}_Torso", (x, y, 1.65 * scale), 0.44 * scale, 1.25 * scale, "RK_MAT_NavyLight", coll, vertices=16, bevel_width=0.05)
+    C.box(f"{name}_Cuirass", (x, y - 0.05 * scale, 1.70 * scale), (0.75 * scale, 0.65 * scale, 0.85 * scale), "RK_MAT_Silver", coll, bevel_width=0.08)
+    C.uv_sphere(f"{name}_Helmet", (x, y, 2.58 * scale), (0.88 * scale, 0.78 * scale, 0.82 * scale), "RK_MAT_Silver", coll, segments=20, rings=12)
+    C.box(f"{name}_Visor", (x, y - 0.40 * scale, 2.54 * scale), (0.76 * scale, 0.14 * scale, 0.22 * scale), "RK_MAT_BlackMetal", coll, bevel_width=0.05)
+    C.cone(f"{name}_Plume", (x, y, 3.20 * scale), 0.22 * scale, 0.05 * scale, 0.76 * scale, "RK_MAT_RedBow", coll, vertices=12)
     for side, sign in (("L", -1), ("R", 1)):
-        C.cylinder_between(f"{name}_Arm.{side}", (x + sign * 0.34 * scale, y, 2.0 * scale), (x + sign * 0.56 * scale, y - 0.05 * scale, 1.35 * scale), 0.13 * scale, "RK_MAT_Silver", coll, vertices=12)
-        C.cylinder_between(f"{name}_Leg.{side}", (x + sign * 0.20 * scale, y, 1.05 * scale), (x + sign * 0.24 * scale, y, 0.28 * scale), 0.17 * scale, "RK_MAT_Silver", coll, vertices=12)
-        C.box(f"{name}_Boot.{side}", (x + sign * 0.24 * scale, y - 0.08 * scale, 0.16 * scale), (0.36 * scale, 0.60 * scale, 0.30 * scale), "RK_MAT_BlackMetal", coll, bevel_width=0.08)
+        C.uv_sphere(f"{name}_Pauldron.{side}", (x + sign * 0.48 * scale, y, 2.18 * scale), (0.32 * scale, 0.30 * scale, 0.28 * scale), "RK_MAT_Silver", coll, segments=12, rings=8)
+        C.cylinder_between(f"{name}_Arm.{side}", (x + sign * 0.38 * scale, y, 2.05 * scale), (x + sign * 0.58 * scale, y - 0.08 * scale, 1.35 * scale), 0.13 * scale, "RK_MAT_Silver", coll, vertices=12)
+        C.cylinder_between(f"{name}_Leg.{side}", (x + sign * 0.22 * scale, y, 1.10 * scale), (x + sign * 0.26 * scale, y, 0.28 * scale), 0.17 * scale, "RK_MAT_Silver", coll, vertices=12)
+        C.box(f"{name}_Boot.{side}", (x + sign * 0.26 * scale, y - 0.10 * scale, 0.16 * scale), (0.36 * scale, 0.62 * scale, 0.30 * scale), "RK_MAT_BlackMetal", coll, bevel_width=0.08)
     spear_x = x + 0.72 * scale
-    C.cylinder(f"{name}_SpearShaft", (spear_x, y, 1.85 * scale), 0.045 * scale, 3.7 * scale, "RK_MAT_BlackMetal", coll, vertices=10, bevel_width=0.01)
-    C.cone(f"{name}_SpearTip", (spear_x, y, 3.95 * scale), 0.17 * scale, 0.02, 0.52 * scale, "RK_MAT_Silver", coll, vertices=8)
+    C.cylinder(f"{name}_SpearShaft", (spear_x, y - 0.10 * scale, 1.90 * scale), 0.045 * scale, 3.8 * scale, "RK_MAT_Wood", coll, vertices=10, bevel_width=0.01)
+    C.cone(f"{name}_SpearTip", (spear_x, y - 0.10 * scale, 4.05 * scale), 0.18 * scale, 0.02, 0.58 * scale, "RK_MAT_Silver", coll, vertices=8)
 
 
-# Autumn tree rows and tall garden cypresses.
+# ---------------------------------------------------------------------------
+# Floating Magic Cube Lantern on Gate Pedestal (Images 1 & 4)
+# ---------------------------------------------------------------------------
+
+cube_x, cube_y, cube_z = 3.1, 6.0, 2.85
+# Lush green ivy and flower vines draping over the pedestal
+C.uv_sphere("RK_Gate_Pedestal_Foliage", (cube_x, cube_y, 2.30), (1.80, 1.60, 0.60), "RK_MAT_LeafGreen", coll, segments=18, rings=10)
+for idx, (dx, dy) in enumerate(((-0.7, -0.6), (0.0, -0.75), (0.7, -0.6), (-0.75, 0.0), (0.75, 0.0))):
+    C.bezier_curve(
+        f"RK_Gate_Pedestal_Vine_{idx:02d}",
+        [(cube_x + dx, cube_y + dy, 2.35), (cube_x + dx * 1.1, cube_y + dy * 1.1, 1.75), (cube_x + dx * 0.95, cube_y + dy * 0.95, 1.15)],
+        0.06,
+        "RK_MAT_LeafGreen",
+        coll,
+        bevel_resolution=2,
+    )
+    C.ico_sphere(f"RK_Gate_Pedestal_Flower_{idx:02d}", (cube_x + dx, cube_y + dy, 2.38), (0.18, 0.18, 0.18), "RK_MAT_FlowerCream" if idx % 2 == 0 else "RK_MAT_FlowerPink", coll, subdivisions=1)
+
+# Floating Golden Magic Cube with angle rotation (Images 1 & 4)
+magic_cube = C.box("RK_Gate_MagicCube_Outer", (cube_x, cube_y, cube_z), (0.78, 0.78, 0.78), "RK_MAT_LanternGlow", coll, rotation=(math.pi / 5, math.pi / 4, math.pi / 6), bevel_width=0.06)
+magic_cube["floating_lantern"] = True
+magic_core = C.star("RK_Gate_MagicCube_Core", (0, 0), 0, 0.28, 0.12, 4, 0.10, "RK_MAT_Gold", coll, rotation=math.pi / 4)
+magic_core.location = (cube_x, cube_y, cube_z)
+# Satellite floating mini crystals
+for mi, (mx, my, mz) in enumerate(((-0.45, -0.35, 0.4), (0.45, 0.35, -0.35), (-0.35, 0.45, -0.2))):
+    C.ico_sphere(f"RK_Gate_MagicCube_Spark_{mi:02d}", (cube_x + mx, cube_y + my, cube_z + mz), (0.12, 0.12, 0.14), "RK_MAT_LanternGlow", coll, subdivisions=1)
+
+
+# ---------------------------------------------------------------------------
+# Stacked Ceramic Jar Topiary Sculpture (Image 2)
+# ---------------------------------------------------------------------------
+
+pot_x, pot_y = 14.8, -0.8
+for idx, (pz, pr1, pr2, ph) in enumerate((
+    (0.40, 0.65, 0.50, 0.75),
+    (1.10, 0.56, 0.44, 0.70),
+    (1.75, 0.48, 0.38, 0.65),
+    (2.35, 0.40, 0.30, 0.60),
+    (2.90, 0.32, 0.22, 0.55),
+)):
+    C.cylinder(f"RK_Topiary_Urn_{idx:02d}", (pot_x, pot_y, pz), pr1, ph, "RK_MAT_BlackMetal", coll, vertices=18, bevel_width=0.04, smooth_shading=True)
+    C.torus(f"RK_Topiary_UrnRing_{idx:02d}", (pot_x, pot_y, pz + ph * 0.35), pr1 * 1.05, 0.04, "RK_MAT_Gold", coll, rotation=(math.pi / 2, 0, 0))
+# Topiary foliage crown
+C.uv_sphere("RK_Topiary_Foliage_Top", (pot_x, pot_y, 3.45), (0.55, 0.55, 0.65), "RK_MAT_LeafGreen", coll, segments=16, rings=12)
+C.uv_sphere("RK_Topiary_Foliage_Base", (pot_x, pot_y, 0.15), (0.85, 0.85, 0.30), "RK_MAT_LeafGreen", coll, segments=16, rings=8)
+
+
+# ---------------------------------------------------------------------------
+# Flower Market Display & NPCs at Guildhall (Images 3 & 5)
+# ---------------------------------------------------------------------------
+
+# Sunflower planters on the left of Guildhall porch (Image 3)
+C.box("RK_Sunflower_Box", (-9.8, 3.2, 0.35), (1.8, 0.7, 0.65), "RK_MAT_Wood", coll, bevel_width=0.05)
+for sfi, sfx in enumerate((-10.4, -9.8, -9.2)):
+    # Stem
+    C.cylinder(f"RK_Sunflower_Stem_{sfi:02d}", (sfx, 3.2, 1.15), 0.035, 1.0, "RK_MAT_LeafGreen", coll, vertices=8)
+    # Head & Petals
+    C.cylinder(f"RK_Sunflower_Center_{sfi:02d}", (sfx, 3.12, 1.65), 0.18, 0.08, "RK_MAT_Wood", coll, vertices=16, rotation=(math.pi / 5, 0, 0))
+    C.cylinder(f"RK_Sunflower_Petals_{sfi:02d}", (sfx, 3.10, 1.65), 0.42, 0.04, "RK_MAT_LeafGold", coll, vertices=16, rotation=(math.pi / 5, 0, 0))
+
+# Blue flower display table on the right of porch (Image 3 & 5)
+C.box("RK_FlowerTable_Right", (-2.2, 3.3, 0.45), (2.0, 0.8, 0.85), "RK_MAT_Wood", coll, bevel_width=0.04)
+for bfi, bfx in enumerate((-2.8, -2.2, -1.6)):
+    C.cone(f"RK_FlowerPot_Blue_{bfi:02d}", (bfx, 3.3, 1.05), 0.22, 0.15, 0.35, "RK_MAT_StoneWarm", coll, vertices=14)
+    C.uv_sphere(f"RK_FlowerFoliage_Blue_{bfi:02d}", (bfx, 3.3, 1.32), (0.28, 0.28, 0.24), "RK_MAT_FlowerBlue", coll, segments=12, rings=8)
+
+# Shopkeeper / Florist NPC (Image 5)
+npc_x, npc_y = -3.6, 3.0
+C.cylinder("RK_NPC_Florist_Legs", (npc_x, npc_y, 0.55), 0.22, 1.05, "RK_MAT_Leather", coll, vertices=12)
+C.cylinder("RK_NPC_Florist_Torso", (npc_x, npc_y, 1.40), 0.34, 0.80, "RK_MAT_White", coll, vertices=12)
+C.box("RK_NPC_Florist_Apron", (npc_x, npc_y - 0.12, 1.25), (0.50, 0.15, 0.90), "RK_MAT_StoneWarm", coll, bevel_width=0.04)
+C.uv_sphere("RK_NPC_Florist_Head", (npc_x, npc_y, 2.05), (0.42, 0.38, 0.44), "RK_MAT_Skin", coll, segments=16, rings=10)
+C.cone("RK_NPC_Florist_Hat", (npc_x, npc_y, 2.38), 0.48, 0.08, 0.35, "RK_MAT_Wood", coll, vertices=16)
+
+# Town girl NPC (Image 3)
+girl_x, girl_y = -6.2, 3.6
+C.cone("RK_NPC_Girl_Dress", (girl_x, girl_y, 0.70), 0.38, 0.14, 1.25, "RK_MAT_NavyLight", coll, vertices=14)
+C.uv_sphere("RK_NPC_Girl_Head", (girl_x, girl_y, 1.55), (0.34, 0.32, 0.36), "RK_MAT_Skin", coll, segments=14, rings=10)
+C.uv_sphere("RK_NPC_Girl_Hair", (girl_x, girl_y, 1.62), (0.38, 0.36, 0.38), "RK_MAT_Wood", coll, segments=14, rings=10)
+
+
+# ---------------------------------------------------------------------------
+# Autumn Trees & Garden Cypresses
+# ---------------------------------------------------------------------------
+
 tree_specs = [
     ("RK_Tree_LeftFront", -13.5, -5.8, 1.05),
     ("RK_Tree_LeftMid", -14.2, 2.2, 1.18),
@@ -151,9 +237,12 @@ tree_specs = [
     ("RK_Tree_RightFront", 15.0, -5.5, 1.05),
     ("RK_Tree_RightMid", 17.0, 1.8, 1.10),
     ("RK_Tree_RightBack", 17.4, 8.8, 0.95),
+    # Gate terrace autumn tree (Image 1 & 4)
+    ("RK_Tree_GateTerrace", 4.2, 9.2, 0.92),
 ]
 for spec in tree_specs:
     tree(*spec)
+
 for idx, (x, y) in enumerate(((3.1, 10.2), (5.0, 10.5), (11.0, 10.5), (12.8, 10.2))):
     cypress(f"RK_Cypress_{idx:02d}", x, y, height=6.2 - 0.2 * (idx % 2), material_name="RK_MAT_LeafGreen" if idx % 2 else "RK_MAT_LeafGold")
 
@@ -168,12 +257,12 @@ for idx, (x, y, sx, sy) in enumerate((
 # Planters placed along the gate and guild façade.
 for idx, (x, y, flower) in enumerate((
     (-10.7, 3.9, "RK_MAT_FlowerBlue"), (-0.1, 3.9, "RK_MAT_FlowerPink"),
-    (3.1, 6.0, "RK_MAT_FlowerCream"), (12.9, 6.0, "RK_MAT_FlowerBlue"),
+    (12.9, 6.0, "RK_MAT_FlowerBlue"),
     (15.0, -1.0, "RK_MAT_FlowerPink"), (-13.0, -1.2, "RK_MAT_FlowerCream"),
 )):
     planter(f"RK_Planter_{idx:02d}", x, y, 0.0, 0.90 if idx > 3 else 1.0, flower)
 
-# Eight curled lamps around the plaza plus two smaller approach lamps.
+# Eight curled lamps around the plaza plus two approach lamps.
 lamp_positions = [
     (-10.8, -6.5), (-10.8, 0.2), (-10.4, 6.0),
     (10.5, -6.5), (11.3, 0.0), (13.2, 6.6),
@@ -186,26 +275,27 @@ bench("RK_Bench_Left", -9.0, 3.3, 0.0)
 bench("RK_Bench_Right", 13.6, 2.5, 0.0)
 bench("RK_Bench_Front", -6.5, -8.7, math.radians(8))
 
-# Festival bunting stretching across the square.
+# Festival bunting stretching across the square (Images 2 & 4).
 for line_idx, (y, z, sag) in enumerate(((2.0, 6.2, 0.75), (7.2, 7.1, 0.55))):
     points = [(-13.5, y, z), (-6.8, y, z - sag), (0.0, y, z - sag * 1.2), (6.8, y, z - sag), (13.5, y, z)]
     C.bezier_curve(f"RK_BuntingCord_{line_idx:02d}", points, 0.025, "RK_MAT_BlackMetal", coll, bevel_resolution=2)
+    bunting_colors = ["RK_MAT_RedBow", "RK_MAT_Gold", "RK_MAT_StoneCream", "RK_MAT_HairCyan", "RK_MAT_PlasterOrange"]
     for idx in range(13):
         x = -12.0 + idx * 2.0
         local_z = z - sag * (1.0 - abs(x) / 13.5)
-        color = "RK_MAT_RedBow" if idx % 2 == 0 else "RK_MAT_StoneCream"
+        color = bunting_colors[idx % len(bunting_colors)]
         C.box(f"RK_Bunting_{line_idx:02d}_{idx:02d}", (x, y, local_z - 0.47), (0.75, 0.08, 0.88), color, coll, rotation=(0, 0, 0.05 * math.sin(idx)), bevel_width=0.04)
         sigil = C.star(f"RK_BuntingSigil_{line_idx:02d}_{idx:02d}", (0, 0), 0, 0.19, 0.08, 4, 0.04, "RK_MAT_Gold", coll, rotation=math.pi / 4)
         sigil.location = (x, y - 0.07, local_z - 0.45)
         sigil.rotation_euler.x = math.pi / 2
 
-# Guard pair on the gate stairs and two plaza sentries.
-knight("RK_Guard_GateLeft", 3.3, 5.8, scale=0.86)
-knight("RK_Guard_GateRight", 12.7, 5.8, scale=0.86)
+# Guard pair on the gate stairs and plaza sentries (Images 1 & 4).
+knight("RK_Guard_GateLeft", 3.2, 5.6, scale=0.92)
+knight("RK_Guard_GateRight", 12.8, 5.6, scale=0.92)
 knight("RK_Guard_PlazaLeft", -12.0, -2.2, scale=0.78)
 knight("RK_Guard_PlazaRight", 14.0, 3.4, scale=0.78)
 
-# Distant pale wizard statue and staff, as seen beyond the plaza.
+# Distant pale wizard statue and staff.
 C.cone("RK_Statue_Robe", (19.0, 10.0, 2.35), 1.35, 0.55, 4.6, "RK_MAT_White", coll, vertices=18, smooth_shading=True)
 C.uv_sphere("RK_Statue_Head", (19.0, 10.0, 5.15), (1.10, 1.00, 1.18), "RK_MAT_White", coll, segments=24, rings=16)
 C.cone("RK_Statue_Hat", (19.0, 10.0, 6.3), 0.85, 0.05, 2.1, "RK_MAT_White", coll, vertices=18)
@@ -214,12 +304,13 @@ C.star("RK_Statue_StaffStar", (0, 0), 0, 0.55, 0.20, 6, 0.10, "RK_MAT_Gold", col
 bpy.data.objects["RK_Statue_StaffStar"].rotation_euler.x = math.pi / 2
 
 # Cyan firefly motes scattered high against the night sky.
-for idx in range(18):
+for idx in range(24):
     x = random.uniform(-15.0, 18.0)
     y = random.uniform(2.0, 16.0)
     z = random.uniform(6.0, 15.0)
-    size = random.uniform(0.05, 0.13)
+    size = random.uniform(0.06, 0.15)
     C.ico_sphere(f"RK_SkyMote_{idx:02d}", (x, y, z), (size, size, size), "RK_MAT_SpriteGlow", coll, subdivisions=1)
 
 C.save_mainfile()
 C.scene_summary("03_environment")
+

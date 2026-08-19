@@ -50,10 +50,16 @@ try:
     group = bpy.data.node_groups.new("RK_Compositor", "CompositorNodeTree")
     render_layers = group.nodes.new("CompositorNodeRLayers")
     glare = group.nodes.new("CompositorNodeGlare")
-    glare.glare_type = "FOG_GLOW"
-    glare.quality = "HIGH"
-    glare.threshold = 1.0
-    glare.size = 6
+    if "Type" in glare.inputs:
+        glare.inputs["Type"].default_value = "Fog Glow"
+    elif hasattr(glare, "glare_type"):
+        glare.glare_type = "FOG_GLOW"
+    if "Quality" in glare.inputs:
+        glare.inputs["Quality"].default_value = "High"
+    if "Threshold" in glare.inputs:
+        glare.inputs["Threshold"].default_value = 0.9
+    if "Size" in glare.inputs:
+        glare.inputs["Size"].default_value = 6
     composite = group.nodes.new("CompositorNodeComposite")
     group.links.new(render_layers.outputs["Image"], glare.inputs["Image"])
     group.links.new(glare.outputs["Image"], composite.inputs["Image"])
@@ -106,6 +112,9 @@ for idx, (location, energy, radius) in enumerate((
     ((15.2, 3.0, 3.1), 680, 2.0),
 )):
     C.point_light(f"RK_Light_Building_{idx:02d}", location, (1.0, 0.30, 0.055), energy, radius, light_coll)
+
+# Floating magic cube lantern light at the gate terrace pedestal (Images 1 & 4).
+C.point_light("RK_Light_MagicCube", (3.1, 6.0, 3.0), (1.0, 0.42, 0.05), 650, 1.8, light_coll)
 
 # A subtle cyan light binds the companion sprite to the hero group.
 C.point_light("RK_Light_Sprite", (-1.13, -4.0, 3.05), (0.02, 0.62, 1.0), 280, 0.8, light_coll)

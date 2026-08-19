@@ -48,8 +48,9 @@ def arched_door(name, x, y, z, width=1.65, height=2.6):
     C.box(f"{name}_Door", (x, y, z + height / 2), (width, 0.18, height), "RK_MAT_Wood", coll, bevel_width=0.12)
     C.arch_ring(f"{name}_Arch", (x, y - 0.08, z + height - width * 0.34), width * 0.55, 0.23, 0.28, "RK_MAT_StoneCream", coll, segments=18)
     C.box(f"{name}_Threshold", (x, y - 0.12, z + 0.08), (width + 0.45, 0.35, 0.18), "RK_MAT_StoneWarm", coll, bevel_width=0.04)
-    C.star(f"{name}_Emblem", (0, 0), 0, 0.32, 0.14, 4, 0.08, "RK_MAT_Gold", coll, rotation=math.pi / 4).rotation_euler.x = math.pi / 2
-    emblem = bpy.context.view_layer.objects.active
+    emblem = C.star(f"{name}_Emblem", (0, 0), 0, 0.32, 0.14, 4, 0.08, "RK_MAT_Gold", coll, rotation=math.pi / 4)
+    emblem.location = (x, y - 0.10, z + height * 0.55)
+    emblem.rotation_euler.x = math.pi / 2
 
 
 def battlement_wall(name, center, dimensions, merlons, material="RK_MAT_StoneCream"):
@@ -63,11 +64,11 @@ def battlement_wall(name, center, dimensions, merlons, material="RK_MAT_StoneCre
         C.box(f"{name}_Merlon_{i:02d}", (mx, y, z + sz / 2 + 0.36), (step * 0.58, sy, 0.72), material, coll, bevel_width=0.05)
 
 
-def tower(name, x, y, height=10.2, radius=2.05):
-    C.cylinder(f"{name}_Body", (x, y, height / 2), radius, height, "RK_MAT_StoneCream", coll, vertices=12, bevel_width=0.08)
-    C.cylinder(f"{name}_Plinth", (x, y, 0.45), radius * 1.12, 0.9, "RK_MAT_StoneWarm", coll, vertices=12, bevel_width=0.08)
-    C.cylinder(f"{name}_UpperBand", (x, y, height - 1.25), radius * 1.10, 0.35, "RK_MAT_RoofRed", coll, vertices=12, bevel_width=0.03)
-    C.cylinder(f"{name}_Crown", (x, y, height - 0.42), radius * 1.16, 0.55, "RK_MAT_StoneCream", coll, vertices=12, bevel_width=0.08)
+def tower(name, x, y, height=11.2, radius=2.15):
+    C.cylinder(f"{name}_Body", (x, y, height / 2), radius, height, "RK_MAT_StoneCream", coll, vertices=16, bevel_width=0.08)
+    C.cylinder(f"{name}_Plinth", (x, y, 0.45), radius * 1.12, 0.9, "RK_MAT_StoneWarm", coll, vertices=16, bevel_width=0.08)
+    C.cylinder(f"{name}_UpperBand", (x, y, height - 1.25), radius * 1.10, 0.35, "RK_MAT_RoofRed", coll, vertices=16, bevel_width=0.03)
+    C.cylinder(f"{name}_Crown", (x, y, height - 0.42), radius * 1.16, 0.55, "RK_MAT_StoneCream", coll, vertices=16, bevel_width=0.08)
     for i in range(8):
         angle = i * math.tau / 8
         C.box(
@@ -102,14 +103,42 @@ C.box("RK_GuildHall_Ridge", (-5.2, 8.35, 9.28), (0.28, 6.7, 0.28), "RK_MAT_RoofH
 # Entry porch with classical columns and a shallow pediment.
 C.box("RK_GuildHall_PorchRoof", (-5.2, 4.65, 4.35), (11.8, 1.75, 0.46), "RK_MAT_StoneCream", coll, bevel_width=0.10)
 C.roof_prism("RK_GuildHall_PorchPediment", (-5.2, 4.55, 4.58), 11.9, 1.75, 1.35, "RK_MAT_StoneCream", coll)
+pediment_star = C.star("RK_GuildHall_PedimentStar", (0, 0), 0, 0.42, 0.18, 4, 0.08, "RK_MAT_Gold", coll, rotation=math.pi / 4)
+pediment_star.location = (-5.2, 3.65, 5.15)
+pediment_star.rotation_euler.x = math.pi / 2
+
 for idx, x in enumerate((-9.7, -6.7, -3.7, -0.7)):
     column(f"RK_GuildHall_Column_{idx:02d}", x, 4.25, 0.35, 4.05, radius=0.37)
 
-# Glowing front windows, main door and side door.
-for idx, x in enumerate((-9.1, -7.0, -3.4, -1.25)):
-    front_window(f"RK_GuildHall_WindowLower_{idx:02d}", x, 5.42, 2.18, 1.08, 1.45, glow=True)
+# Hanging flower baskets under the porch arches (as seen in Image 3).
+for idx, x in enumerate((-8.2, -5.2, -2.2)):
+    # Chain from ceiling
+    C.cylinder(f"RK_GuildHall_HangingChain_{idx:02d}", (x, 4.35, 3.75), 0.015, 0.70, "RK_MAT_BlackMetal", coll, vertices=8)
+    # Terracotta pot
+    C.cone(f"RK_GuildHall_HangingPot_{idx:02d}", (x, 4.35, 3.32), 0.28, 0.18, 0.30, "RK_MAT_StoneWarm", coll, vertices=16, smooth_shading=True)
+    # Flower foliage mound
+    C.uv_sphere(f"RK_GuildHall_HangingFoliage_{idx:02d}", (x, 4.35, 3.52), (0.34, 0.34, 0.24), "RK_MAT_LeafGreen", coll, segments=16, rings=10)
+    # Orange / red blooms
+    for fi in range(5):
+        fa = fi * math.tau / 5
+        fx = x + math.cos(fa) * 0.18
+        fy = 4.35 + math.sin(fa) * 0.18
+        C.ico_sphere(f"RK_GuildHall_HangingBloom_{idx:02d}_{fi:02d}", (fx, fy, 3.52), (0.10, 0.10, 0.10), "RK_MAT_LeafOrange" if fi % 2 == 0 else "RK_MAT_RedBow", coll, subdivisions=1)
+
+# Large ornate arched display window with decorative iron tracery on the left.
+C.box("RK_GuildHall_ArchedWindow_Pane", (-8.2, 5.42, 2.35), (2.4, 0.12, 2.1), "RK_MAT_WindowGlow", coll, bevel_width=0.04)
+C.arch_ring("RK_GuildHall_ArchedWindow_Frame", (-8.2, 5.38, 2.35), 1.22, 0.18, 0.22, "RK_MAT_StoneCream", coll, segments=20)
+# Iron scrollwork tracery
+C.torus("RK_GuildHall_IronScroll_01", (-8.2, 5.34, 2.35), 0.55, 0.035, "RK_MAT_BlackMetal", coll, rotation=(math.pi / 2, 0, 0))
+C.box("RK_GuildHall_IronCross_V", (-8.2, 5.34, 2.35), (0.05, 0.08, 2.0), "RK_MAT_BlackMetal", coll, bevel_width=0.01)
+C.box("RK_GuildHall_IronCross_H", (-8.2, 5.34, 2.35), (2.3, 0.08, 0.05), "RK_MAT_BlackMetal", coll, bevel_width=0.01)
+
+# Front windows and double door.
+front_window("RK_GuildHall_WindowLower_01", -3.4, 5.42, 2.18, 1.08, 1.45, glow=True)
+front_window("RK_GuildHall_WindowLower_02", -1.25, 5.42, 2.18, 1.08, 1.45, glow=True)
 for idx, x in enumerate((-8.8, -6.0, -3.2, -0.5)):
     front_window(f"RK_GuildHall_WindowUpper_{idx:02d}", x, 5.42, 4.65, 1.12, 1.55, glow=True)
+
 C.box("RK_GuildHall_Door", (-5.2, 5.34, 1.65), (1.72, 0.24, 2.85), "RK_MAT_Wood", coll, bevel_width=0.14)
 C.arch_ring("RK_GuildHall_DoorArch", (-5.2, 5.28, 2.72), 1.06, 0.24, 0.30, "RK_MAT_StoneCream", coll, segments=20)
 C.box("RK_GuildHall_DoorMullion", (-5.2, 5.18, 1.70), (0.10, 0.13, 2.40), "RK_MAT_Gold", coll, bevel_width=0.02)
@@ -117,15 +146,25 @@ door_sigil = C.star("RK_GuildHall_DoorSigil", (0, 0), 0, 0.43, 0.18, 4, 0.08, "R
 door_sigil.location = (-5.2, 5.06, 2.0)
 door_sigil.rotation_euler.x = math.pi / 2
 
-# Tall right wing and turret reproduce the reference's asymmetric roofline.
+# Tall right wing and attached round turret (Image 2, 3, 5).
 C.box("RK_GuildHall_TowerWing", (1.55, 8.6, 4.35), (4.2, 5.0, 8.4), "RK_MAT_PlasterGold", coll, bevel_width=0.16)
 band("RK_GuildHall_TowerWingBand", (1.55, 6.05, 4.65), (4.45, 0.30, 0.32))
 for level, z in enumerate((2.25, 5.25)):
     front_window(f"RK_GuildHall_TowerWindow_{level:02d}", 1.55, 6.02, z, 0.96, 1.42, glow=True)
 C.roof_prism("RK_GuildHall_TowerRoof", (1.55, 8.60, 8.48), 4.8, 5.5, 3.6, "RK_MAT_RoofRed", coll)
-C.cone("RK_GuildHall_TurretRoof", (2.95, 7.35, 10.5), 1.25, 0.08, 3.8, "RK_MAT_RoofHighlight", coll, vertices=20)
-C.cylinder("RK_GuildHall_TurretFinial", (2.95, 7.35, 12.65), 0.12, 0.75, "RK_MAT_Gold", coll, vertices=12, bevel_width=0.02)
-C.ico_sphere("RK_GuildHall_TurretGem", (2.95, 7.35, 13.08), (0.40, 0.40, 0.50), "RK_MAT_SpriteGlow", coll, subdivisions=1)
+
+# Round stone tower attached to right corner of Guildhall (Image 2 & 5).
+tower_x, tower_y = 2.95, 7.35
+C.cylinder("RK_GuildHall_RoundTowerBody", (tower_x, tower_y, 4.8), 1.65, 9.6, "RK_MAT_StoneCream", coll, vertices=20, bevel_width=0.06, smooth_shading=True)
+C.cylinder("RK_GuildHall_RoundTowerBase", (tower_x, tower_y, 0.5), 1.82, 1.0, "RK_MAT_StoneWarm", coll, vertices=20, bevel_width=0.08)
+C.cylinder("RK_GuildHall_RoundTowerCornice", (tower_x, tower_y, 9.5), 1.80, 0.42, "RK_MAT_StoneCream", coll, vertices=20, bevel_width=0.06)
+# Arched wooden door on the ground floor of the round tower (Image 5).
+C.box("RK_GuildHall_RoundTowerDoor", (tower_x, tower_y - 1.60, 1.35), (1.10, 0.18, 2.10), "RK_MAT_Wood", coll, bevel_width=0.10)
+C.arch_ring("RK_GuildHall_RoundTowerDoorArch", (tower_x, tower_y - 1.62, 2.15), 0.58, 0.16, 0.22, "RK_MAT_StoneCream", coll, segments=16)
+# Red conical roof and crystal spire on turret
+C.cone("RK_GuildHall_TurretRoof", (tower_x, tower_y, 11.2), 1.75, 0.08, 3.8, "RK_MAT_RoofHighlight", coll, vertices=24, smooth_shading=True)
+C.cylinder("RK_GuildHall_TurretFinial", (tower_x, tower_y, 13.35), 0.12, 0.75, "RK_MAT_Gold", coll, vertices=12, bevel_width=0.02)
+C.ico_sphere("RK_GuildHall_TurretGem", (tower_x, tower_y, 13.78), (0.40, 0.40, 0.50), "RK_MAT_SpriteGlow", coll, subdivisions=1)
 
 # Dormers and chimneys.
 for idx, x in enumerate((-8.0, -4.9, -1.9)):
@@ -145,7 +184,9 @@ gate_x = 8.0
 C.box("RK_CastleGate_Main", (gate_x, 12.0, 8.35), (10.5, 2.4, 3.2), "RK_MAT_StoneCream", coll, bevel_width=0.12)
 C.box("RK_CastleGate_LeftPier", (gate_x - 4.45, 11.5, 4.1), (2.15, 3.4, 8.0), "RK_MAT_StoneCream", coll, bevel_width=0.12)
 C.box("RK_CastleGate_RightPier", (gate_x + 4.45, 11.5, 4.1), (2.15, 3.4, 8.0), "RK_MAT_StoneCream", coll, bevel_width=0.12)
-C.box("RK_CastleGate_Opening", (gate_x, 10.92, 3.25), (6.7, 0.20, 6.3), "RK_MAT_StoneDark", coll, bevel_width=0.02)
+
+# Arch portal and glowing inner vault.
+C.box("RK_CastleGate_Opening", (gate_x, 11.5, 3.25), (6.7, 1.2, 6.3), "RK_MAT_WindowGlow", coll, bevel_width=0.02)
 C.arch_ring("RK_CastleGate_Arch", (gate_x, 10.70, 3.25), 3.35, 0.62, 0.72, "RK_MAT_StoneCream", coll, segments=30)
 for side, x in (("L", gate_x - 3.66), ("R", gate_x + 3.66)):
     C.box(f"RK_CastleGate_ArchLeg_{side}", (x, 10.70, 1.75), (0.62, 0.72, 3.5), "RK_MAT_StoneCream", coll, bevel_width=0.05)
@@ -154,25 +195,43 @@ for i in range(9):
     x = gate_x - 4.55 + i * 1.14
     C.box(f"RK_CastleGate_Merlon_{i:02d}", (x, 11.65, 10.32), (0.70, 1.25, 0.86), "RK_MAT_StoneCream", coll, bevel_width=0.06)
 
-# Gate crest and suspended red-gold banners.
-C.star("RK_CastleGate_CrestBack", (0, 0), 0, 1.35, 0.58, 6, 0.18, "RK_MAT_Bronze", coll, rotation=math.pi / 6).location = (gate_x, 10.45, 9.18)
-crest = bpy.data.objects["RK_CastleGate_CrestBack"]
-crest.rotation_euler.x = math.pi / 2
-C.star("RK_CastleGate_CrestGold", (0, 0), 0, 0.84, 0.36, 6, 0.20, "RK_MAT_Gold", coll, rotation=math.pi / 6).location = (gate_x, 10.32, 9.20)
-bpy.data.objects["RK_CastleGate_CrestGold"].rotation_euler.x = math.pi / 2
+# Royal Shield Crest above the main archway (as seen in Image 1 & 4).
+C.box("RK_CastleGate_ShieldBack", (gate_x, 10.42, 9.25), (1.65, 0.18, 1.95), "RK_MAT_StoneWarm", coll, bevel_width=0.10)
+C.box("RK_CastleGate_ShieldFace", (gate_x, 10.32, 9.25), (1.42, 0.12, 1.72), "RK_MAT_RedBow", coll, bevel_width=0.08)
+crest_crown = C.star("RK_CastleGate_Crown", (0, 0), 0, 0.45, 0.22, 5, 0.10, "RK_MAT_Gold", coll, rotation=0.0)
+crest_crown.location = (gate_x, 10.24, 10.15)
+crest_crown.rotation_euler.x = math.pi / 2
+crest_emblem = C.star("RK_CastleGate_ShieldEmblem", (0, 0), 0, 0.52, 0.24, 4, 0.08, "RK_MAT_Gold", coll, rotation=math.pi / 4)
+crest_emblem.location = (gate_x, 10.22, 9.15)
+crest_emblem.rotation_euler.x = math.pi / 2
+
+# Gate suspended red-gold heraldic banners.
 for idx, x in enumerate((gate_x - 2.15, gate_x + 2.15)):
     C.box(f"RK_CastleGate_Banner_{idx:02d}", (x, 10.47, 7.35), (1.25, 0.10, 3.70), "RK_MAT_RedBow", coll, bevel_width=0.05)
     sigil = C.star(f"RK_CastleGate_BannerSigil_{idx:02d}", (0, 0), 0, 0.38, 0.17, 4, 0.07, "RK_MAT_Gold", coll, rotation=math.pi / 4)
     sigil.location = (x, 10.35, 7.55)
     sigil.rotation_euler.x = math.pi / 2
+    # Gold fringe trim at the bottom of the banner
+    C.box(f"RK_CastleGate_BannerFringe_{idx:02d}", (x, 10.47, 5.45), (1.25, 0.12, 0.18), "RK_MAT_Gold", coll, bevel_width=0.02)
 
-# Grand approach steps and red carpet.
-for i in range(9):
-    y = 6.75 + i * 0.48
-    z = 0.18 + i * 0.20
-    depth = 0.54
-    C.box(f"RK_CastleGate_Step_{i:02d}", (gate_x, y, z), (8.6, depth, 0.40), "RK_MAT_StoneCream", coll, bevel_width=0.04)
-    C.box(f"RK_CastleGate_Carpet_{i:02d}", (gate_x, y - 0.02, z + 0.215), (3.15, depth * 0.92, 0.06), "RK_MAT_RedBow", coll, bevel_width=0.02)
+# Grand approach steps and red carpet runner (Image 1, 4, 5).
+for i in range(10):
+    y = 6.45 + i * 0.46
+    z = 0.16 + i * 0.19
+    depth = 0.52
+    C.box(f"RK_CastleGate_Step_{i:02d}", (gate_x, y, z), (8.6, depth, 0.38), "RK_MAT_StoneCream", coll, bevel_width=0.04)
+    C.box(f"RK_CastleGate_Carpet_{i:02d}", (gate_x, y - 0.02, z + 0.205), (3.15, depth * 0.94, 0.06), "RK_MAT_RedBow", coll, bevel_width=0.02)
+    # Gold carpet border
+    for bx in (gate_x - 1.55, gate_x + 1.55):
+        C.box(f"RK_CastleGate_CarpetBorder_{i:02d}_{'L' if bx < gate_x else 'R'}", (bx, y - 0.02, z + 0.215), (0.12, depth * 0.94, 0.07), "RK_MAT_Gold", coll, bevel_width=0.01)
+
+# Elevated planter terrace to the left of the gate stairs (Image 1 & 4).
+C.box("RK_Gate_Terrace_Plinth", (3.2, 8.8, 1.15), (2.8, 5.2, 2.3), "RK_MAT_StoneWarm", coll, bevel_width=0.12)
+C.box("RK_Gate_Terrace_Wall", (3.2, 8.8, 2.45), (2.95, 5.35, 0.55), "RK_MAT_StoneCream", coll, bevel_width=0.08)
+# Square pedestal at the front corner of the terrace for the floating magic cube lantern!
+C.box("RK_Gate_CubePedestal_Base", (3.1, 6.0, 0.65), (1.65, 1.45, 1.30), "RK_MAT_StoneWarm", coll, bevel_width=0.10)
+C.box("RK_Gate_CubePedestal_Shaft", (3.1, 6.0, 1.65), (1.40, 1.25, 0.85), "RK_MAT_StoneCream", coll, bevel_width=0.08)
+C.box("RK_Gate_CubePedestal_Cap", (3.1, 6.0, 2.15), (1.75, 1.55, 0.24), "RK_MAT_StoneWarm", coll, bevel_width=0.06)
 
 tower("RK_CastleTower_Left", 1.25, 13.2, 11.2, 2.15)
 tower("RK_CastleTower_Right", 14.75, 13.2, 11.2, 2.15)
